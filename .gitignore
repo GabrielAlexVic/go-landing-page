@@ -1,0 +1,39 @@
+# Binaries and executables
+/bin/
+/dist/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binaries and output
+*.test
+*.out
+*.prof
+coverage.txt
+coverage.html
+
+# Air live reload tool temporary files
+tmp/
+build-errors.log
+
+# Dependency and vendor directories
+vendor/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS specific files
+.DS_Store
+Thumbs.db
+desktop.ini

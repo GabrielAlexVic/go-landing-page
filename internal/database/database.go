@@ -66,6 +66,21 @@ func createAllTables(db *sqlx.DB) error {
 		return err
 	}
 
+	_, err = db.Exec(queries.CreatePageViewsTable)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec(queries.CreateLeadsTable)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec(queries.CreateEventsTable)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

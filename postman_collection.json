@@ -1,0 +1,331 @@
+{
+	"info": {
+		"_postman_id": "b3f2e1a4-9876-4abc-8def-[#00F5A0]",
+		"name": "GVByte Landing Page & Analytics API",
+		"description": "Collection de endpoints para o serviço de métricas e analytics da landing page da GVByte.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080/api",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Autenticação",
+			"item": [
+				{
+					"name": "Login Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.token) {",
+									"    pm.collectionVariables.set('token', jsonData.token);",
+									"    console.log('Token JWT salvo com sucesso!');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@gvbyte.com\",\n  \"password\": \"sua_senha_aqui\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "Autentica o admin e salva o token JWT automaticamente na variável da coleção."
+					},
+					"response": []
+				},
+				{
+					"name": "Gerar Hash de Senha",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"password\": \"sua_senha_aqui\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/hash-password",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"hash-password"
+							]
+						},
+						"description": "Utilitário para gerar hash bcrypt de uma senha plana."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Telemetria (Pública)",
+			"item": [
+				{
+					"name": "Registrar Page View",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"session_id\": \"sess_demo_12345\",\n  \"visitor_hash\": \"v_demo_67890\",\n  \"page_path\": \"/\",\n  \"referrer\": \"https://instagram.com\",\n  \"utm_source\": \"instagram\",\n  \"utm_medium\": \"bio\",\n  \"utm_campaign\": \"lancamento_setembro\",\n  \"utm_term\": \"software\",\n  \"utm_content\": \"link_bio\",\n  \"device_type\": \"mobile\",\n  \"browser\": \"Chrome\",\n  \"os\": \"Android\",\n  \"duration_seconds\": 20\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/page-views",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"page-views"
+							]
+						},
+						"description": "Registra o acesso de um visitante à landing page."
+					},
+					"response": []
+				},
+				{
+					"name": "Registrar Evento (Clique/Scroll)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"session_id\": \"sess_demo_12345\",\n  \"event_type\": \"click_cta\",\n  \"event_label\": \"btn_hero_agendar\",\n  \"metadata\": {\n    \"section\": \"hero\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/events",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"events"
+							]
+						},
+						"description": "Registra um evento de clique ou interação do usuário."
+					},
+					"response": []
+				},
+				{
+					"name": "Capturar Lead",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"session_id\": \"sess_demo_12345\",\n  \"name\": \"João Silva\",\n  \"email\": \"joao@empresa.com\",\n  \"company\": \"Empresa XPTO\",\n  \"phone\": \"(11) 99999-9999\",\n  \"description\": \"Gostaria de agendar um diagnóstico técnico para minha empresa.\",\n  \"utm_source\": \"google\",\n  \"utm_campaign\": \"search_ads\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/leads",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"leads"
+							]
+						},
+						"description": "Registra o formulário enviado por um potencial cliente."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Painel Admin (Protegido por JWT)",
+			"item": [
+				{
+					"name": "Resumo de Métricas (Dashboard)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/metrics/summary",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"metrics",
+								"summary"
+							]
+						},
+						"description": "Retorna o resumo estatístico consolidado (Page views, visitantes únicos, leads, CVR %, top UTMs e dispositivos)."
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Page Views",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/page-views?limit=50&cursor=0",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"page-views"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "50"
+								},
+								{
+									"key": "cursor",
+									"value": "0"
+								}
+							]
+						},
+						"description": "Lista os acessos registrados com suporte a paginação."
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Eventos",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/events?limit=50&cursor=0",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"events"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "50"
+								},
+								{
+									"key": "cursor",
+									"value": "0"
+								}
+							]
+						},
+						"description": "Lista os eventos de interações gravados no banco."
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Leads",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/leads?limit=50&cursor=0",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"leads"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "50"
+								},
+								{
+									"key": "cursor",
+									"value": "0"
+								}
+							]
+						},
+						"description": "Lista os leads e mensagens capturadas."
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

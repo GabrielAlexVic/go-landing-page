@@ -14,5 +14,9 @@ CREATE TABLE IF NOT EXISTS users (
 `
 
 const CreateUser = `
-INSERT INTO users (name, email, password_hash) VALUES (:name, :email, ":password_hash")
+	INSERT INTO users (name, email, password_hash) VALUES (:name, :email, :password_hash)
+`
+
+const GetUserByEmail = `
+	SELECT * FROM users WHERE email = $1
 `

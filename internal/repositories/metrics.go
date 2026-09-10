@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"math"
+	"sort"
 
 	"go-landing-page/internal/database"
 	"go-landing-page/internal/database/queries"
@@ -62,5 +63,62 @@ func (r *MetricsRepository) GetSummary() (dto.MetricsSummary, error) {
 		summary.TopDevices = []dto.NameCountPair{}
 	}
 
+	var topEvents []dto.NameCountPair
+	err = db.Select(&topEvents, queries.GetTopEvents)
+	if err == nil {
+		summary.TopEvents = topEvents
+	} else {
+		summary.TopEvents = []dto.NameCountPair{}
+	}
+
+	var topLeadSources []dto.NameCountPair
+	err = db.Select(&topLeadSources, queries.GetTopLeadSources)
+	if err == nil {
+		summary.TopLeadSources = topLeadSources
+	} else {
+		summary.TopLeadSources = []dto.NameCountPair{}
+	}
+
+	var dailyViews []dto.NameCountPair
+	var dailyLeads []dto.NameCountPair
+
+	_ = db.Select(&dailyViews, queries.GetDailyPageViews)
+	_ = db.Select(&dailyLeads, queries.GetDailyLeads)
+
+	dateMap := make(map[string]*dto.DailyMetric)
+
+	for _, v := range dailyViews {
+		dateMap[v.Name] = &dto.DailyMetric{
+			Date:      v.Name,
+			PageViews: v.Count,
+			Leads:     0,
+		}
+	}
+
+	for _, l := range dailyLeads {
+		if item, exists := dateMap[l.Name]; exists {
+			item.Leads = l.Count
+		} else {
+			dateMap[l.Name] = &dto.DailyMetric{
+				Date:      l.Name,
+				PageViews: 0,
+				Leads:     l.Count,
+			}
+		}
+	}
+
+	var dates []string
+	for d := range dateMap {
+		dates = append(dates, d)
+	}
+	sort.Strings(dates)
+
+	dailyTrends := make([]dto.DailyMetric, 0, len(dates))
+	for _, d := range dates {
+		dailyTrends = append(dailyTrends, *dateMap[d])
+	}
+	summary.DailyTrends = dailyTrends
+
 	return summary, nil
 }
+
